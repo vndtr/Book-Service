@@ -19,11 +19,11 @@ def get_status_display(status):
         return "Неизвестный статус"
 
 
-user_name = "Анна"
+user_name = "Алена"
 
-book_title = "Война и мир"
-book_author = "Лев Толстой"
-book_year = 1869
+book_title = "Кафка на пляже"
+book_author = "Харуки Муракми"
+book_year = 2002
 book_status = STATUS_READING
 
 print(f"Пользователь: {user_name}")
@@ -57,7 +57,7 @@ if new_status is not None:
     current_date = datetime.datetime.now()
     date_str = current_date.strftime("%d.%m.%Y")
     
-    print(f"\nСтатус изменен: {get_status_display(old_status)} -> {get_status_display(book_status)}")
+    print(f"\nСтатус изменен на: {get_status_display(book_status)}")
     print(f"Дата изменения: {date_str}")
 else:
     print("Неверный выбор")
