@@ -1,7 +1,6 @@
 """Вспомогательные функции проекта."""
 
 from datetime import date, datetime
-from typing import Optional
 
 
 def input_int(prompt: str) -> int:

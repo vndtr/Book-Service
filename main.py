@@ -2,10 +2,6 @@
 
 from books import (
     ALL_STATUSES,
-    STATUS_READ,
-    STATUS_READING,
-    STATUS_WANT_TO_READ,
-    STATUS_ON_HOLD,
     add_book,
     change_status,
     filter_books_by_status,
