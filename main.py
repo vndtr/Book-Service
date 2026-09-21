@@ -1,28 +1,29 @@
 """Точка запуска программы."""
 
-from books import (
-    ALL_STATUSES,
+import autopip
+
+from book import get_book_info, validate_book
+from book_list import (
     add_book,
     change_status,
     filter_books_by_status,
     find_books,
     get_statistics,
-    get_status_display,
     remove_book,
     sort_books_by_title,
     sort_books_by_year,
 )
+from status import ALL_STATUSES, get_status_display
+from user import create_user, get_user_name
 from storage import load_books, save_books
 from utils import input_int, input_non_empty, input_status
 
-USER_NAME = "Алена"
+USER_NAME = create_user(1, "Алена")
 
 
 def show_book(book: dict) -> None:
     """Вывести информацию об одной книге."""
-    status = get_status_display(book["status"])
-    print(f"  [{book['id']}] \"{book['title']}\" — {book['author']} "
-          f"({book['year']}) | Статус: {status}")
+    print(f"  {get_book_info(book)}")
 
 
 def show_books(books: list) -> None:
@@ -68,6 +69,12 @@ def add_book_menu(books: list) -> None:
     author = input_non_empty("Автор: ")
     year = input_int("Год издания: ")
     status = input_status("Выберите статус: ", ALL_STATUSES)
+
+    error = validate_book(title, author, year)
+    if error:
+        print(f"Ошибка: {error}")
+        return
+
     book = add_book(books, title, author, year, status)
     print(f"Книга \"{book['title']}\" добавлена с ID {book['id']}.")
 
@@ -120,13 +127,13 @@ def show_statistics(books: list) -> None:
     stats = get_statistics(books)
     print("\n" + "=" * 60)
     print("СТАТИСТИКА")
-    print("=" * 60)
+    print(" ")
     print(f"Пользователь: {USER_NAME}")
     print(f"Всего книг: {stats['total']}")
     for status, count in stats["by_status"].items():
         print(f"  {get_status_display(status)}: {count}")
     print(f"Прогресс чтения: {stats['read_percent']:.1f}%")
-    print("=" * 60)
+    print(" ")
 
 
 def show_menu() -> None:
