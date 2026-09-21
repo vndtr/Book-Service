@@ -2,28 +2,15 @@
 
 import autopip
 
-from book import get_book_info, validate_book
-from book_list import (
-    add_book,
-    change_status,
-    filter_books_by_status,
-    find_books,
-    get_statistics,
-    remove_book,
-    sort_books_by_title,
-    sort_books_by_year,
-)
-from status import ALL_STATUSES, get_status_display
-from user import create_user, get_user_name
-from storage import load_books, save_books
+from models import Book, BookList, User
+from models.status import ALL_STATUSES, get_status_display
+from storage import load_books, load_users, save_books, save_users
 from utils import input_int, input_non_empty, input_status
 
-USER_NAME = create_user(1, "Алена")
 
-
-def show_book(book: dict) -> None:
+def show_book(book: Book) -> None:
     """Вывести информацию об одной книге."""
-    print(f"  {get_book_info(book)}")
+    print(f"  {book}")
 
 
 def show_books(books: list) -> None:
@@ -35,34 +22,34 @@ def show_books(books: list) -> None:
         show_book(book)
 
 
-def show_all_books(books: list) -> None:
+def show_all_books(book_list: BookList) -> None:
     """Вывести все книги пользователя."""
     print("\nВСЕ КНИГИ")
-    show_books(books)
+    show_books(book_list.books)
     print(" ")
-    print(f"Всего книг: {len(books)}")
+    print(f"Всего книг: {len(book_list)}")
 
 
-def show_books_by_status(books: list) -> None:
+def show_books_by_status(book_list: BookList) -> None:
     """Вывести книги по выбранному статусу."""
     status = input_status("Выберите статус: ", ALL_STATUSES)
-    filtered = filter_books_by_status(books, status)
+    filtered = book_list.filter_by_status(status)
     print(" ")
     print(f"КНИГИ СО СТАТУСОМ: {get_status_display(status)}")
     show_books(filtered)
     print(f"Всего: {len(filtered)}")
 
 
-def search_books(books: list) -> None:
+def search_books(book_list: BookList) -> None:
     """Поиск книг по подстроке."""
     query = input_non_empty("Введите название или автора: ")
-    found = find_books(books, query)
+    found = book_list.find(query)
     print(" ")
     print(f"РЕЗУЛЬТАТЫ ПОИСКА: {len(found)}")
     show_books(found)
 
 
-def add_book_menu(books: list) -> None:
+def add_book_menu(book_list: BookList) -> None:
     """Добавить новую книгу."""
     print("\nДОБАВЛЕНИЕ КНИГИ")
     title = input_non_empty("Название: ")
@@ -70,65 +57,65 @@ def add_book_menu(books: list) -> None:
     year = input_int("Год издания: ")
     status = input_status("Выберите статус: ", ALL_STATUSES)
 
-    error = validate_book(title, author, year)
+    error = Book.validate(title, author, year)
     if error:
         print(f"Ошибка: {error}")
         return
 
-    book = add_book(books, title, author, year, status)
-    print(f"Книга \"{book['title']}\" добавлена с ID {book['id']}.")
+    book = Book(0, title, author, year, status)
+    print(f"Книга \"{book.title}\" добавлена с ID {book.id}.")
 
 
-def change_status_menu(books: list) -> None:
+def change_status_menu(book_list: BookList) -> None:
     """Изменить статус книги."""
-    if not books:
+    if not book_list.books:
         print("Список книг пуст.")
         return
-    show_books(books)
+    show_books(book_list.books)
     book_id = input_int("Введите ID книги: ")
     status = input_status("Выберите новый статус: ", ALL_STATUSES)
-    if change_status(books, book_id, status):
+    if book_list.change_status(book_id, status):
         print("Статус изменен.")
     else:
         print("Книга не найдена.")
 
 
-def remove_book_menu(books: list) -> None:
+def remove_book_menu(book_list: BookList) -> None:
     """Удалить книгу."""
-    if not books:
+    if not book_list.books:
         print("Список книг пуст.")
         return
-    show_books(books)
+    show_books(book_list.books)
     book_id = input_int("Введите ID книги для удаления: ")
-    removed = remove_book(books, book_id)
+    removed = book_list.remove(book_id)
     if removed:
-        print(f"Книга \"{removed['title']}\" удалена.")
+        print(f"Книга \"{removed.title}\" удалена.")
     else:
         print("Книга не найдена.")
 
 
-def sort_books_menu(books: list) -> None:
+def sort_books_menu(book_list: BookList) -> None:
     """Сортировка и вывод книг."""
     print("1. По названию")
     print("2. По году издания")
     choice = input_int("Выберите способ сортировки: ")
     if choice == 1:
-        sorted_books = sort_books_by_title(books)
+        sorted_books = book_list.sort_by_title()
     elif choice == 2:
-        sorted_books = sort_books_by_year(books)
+        sorted_books = book_list.sort_by_year()
     else:
         print("Неверный выбор.")
         return
     show_books(sorted_books)
 
 
-def show_statistics(books: list) -> None:
+def show_statistics(book_list: BookList) -> None:
     """Вывести статистику."""
-    stats = get_statistics(books)
+    stats = book_list.get_statistics()
     print("\n" + "=" * 60)
     print("СТАТИСТИКА")
     print(" ")
-    print(f"Пользователь: {USER_NAME}")
+    print(f"Пользователь: {book_list.user_name}")
     print(f"Всего книг: {stats['total']}")
     for status, count in stats["by_status"].items():
         print(f"  {get_status_display(status)}: {count}")
@@ -136,10 +123,10 @@ def show_statistics(books: list) -> None:
     print(" ")
 
 
-def show_menu() -> None:
+def show_menu(user_name: str) -> None:
     """Вывести главное меню."""
     print("\n СИСТЕМА УЧЕТА КНИГ ДЛЯ ЧТЕНИЯ")
-    print(f"Пользователь: {USER_NAME}")
+    print(f"Пользователь: {user_name}")
     print(" ")
     print("1. Показать все книги")
     print("2. Показать книги по статусу")
@@ -154,31 +141,42 @@ def show_menu() -> None:
 
 def main() -> None:
     """Точка входа программы."""
-    books = load_books()
-    print(f"Загружено книг: {len(books)}")
+    users = load_users()
+    if users:
+        user = users[0]
+    else:
+        user = User(1, "Алена")
+        users = [user]
+
+    book_list = BookList(user.name)
+    for book in load_books():
+        book_list.add(book)
+
+    print(f"Загружено книг: {len(book_list)}")
 
     while True:
-        show_menu()
+        show_menu(user.name)
         choice = input("Выберите действие: ").strip()
 
         if choice == "1":
-            show_all_books(books)
+            show_all_books(book_list)
         elif choice == "2":
-            show_books_by_status(books)
+            show_books_by_status(book_list)
         elif choice == "3":
-            search_books(books)
+            search_books(book_list)
         elif choice == "4":
-            add_book_menu(books)
+            add_book_menu(book_list)
         elif choice == "5":
-            change_status_menu(books)
+            change_status_menu(book_list)
         elif choice == "6":
-            remove_book_menu(books)
+            remove_book_menu(book_list)
         elif choice == "7":
-            sort_books_menu(books)
+            sort_books_menu(book_list)
         elif choice == "8":
-            show_statistics(books)
+            show_statistics(book_list)
         elif choice == "0":
-            save_books(books)
+            save_books(book_list.books)
+            save_users(users)
             print("Данные сохранены. До свидания!")
             break
         else:
