@@ -1,0 +1,16 @@
+body {
+    min-height: 100vh;
+}
+
+.book-service-logo {
+    width: 120px;
+    height: auto;
+    margin: 1rem;
+}
+
+.book-card {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}

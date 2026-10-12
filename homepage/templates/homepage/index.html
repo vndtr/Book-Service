@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Главная — Book Service{% endblock %}
+{% block content %}
+<h1 class="display-4">Book Service</h1>
+<p class="lead">Система учета книг для чтения.</p>
+<p>Основные разделы:</p>
+<a href="{% url 'books:list' %}" class="btn btn-primary me-2">Книги</a>
+{% endblock %}

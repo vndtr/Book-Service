@@ -1,4 +1,4 @@
-"""Маршрутизация верхнего уровня проекта Book Service."""
+"""Маршрутизация верхнего уровня."""
 
 from django.contrib import admin
 from django.urls import include, path
@@ -9,5 +9,4 @@ urlpatterns = [
     path("books/", include("books.urls")),
 ]
 
-# Обработчик ошибки 404 читается только из корневого urls.py
 handler404 = "homepage.views.page_not_found"

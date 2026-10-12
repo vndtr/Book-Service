@@ -1,0 +1,14 @@
+<article class="card book-card mb-3">
+    <div class="card-body">
+        <h2 class="card-title">
+            {{ book.title|default:"Без названия" }}
+        </h2>
+        <p class="card-text">
+            Автор: {{ book.author }}<br>
+            Год: {{ book.year }}<br>
+            Статус: {{ book.status }}
+        </p>
+        <a href="{% url 'books:detail' book.id %}"
+           class="btn btn-primary">Подробнее</a>
+    </div>
+</article>

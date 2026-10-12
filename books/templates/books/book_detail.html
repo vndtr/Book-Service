@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}
+    {% if book %}{{ book.title }} — Book Service{% else %}Книга не найдена{% endif %}
+{% endblock %}
+{% block content %}
+{% if book %}
+    <div class="card">
+        <div class="card-body">
+            <h1 class="card-title">{{ book.title }}</h1>
+            <p class="card-text"><strong>ID:</strong> {{ book.id }}</p>
+            <p class="card-text"><strong>Автор:</strong> {{ book.author }}</p>
+            <p class="card-text"><strong>Год:</strong> {{ book.year }}</p>
+            <p class="card-text"><strong>Статус:</strong> {{ book.status }}</p>
+            <p class="card-text"><strong>Прочитана:</strong>
+                {% if book.is_read %}да{% else %}нет{% endif %}
+            </p>
+        </div>
+    </div>
+{% else %}
+    <h1 class="text-danger">Книга не найдена</h1>
+    <p>Книги с указанным идентификатором нет в списке.</p>
+{% endif %}
+
+<a href="{% url 'books:list' %}"
+   class="btn btn-outline-secondary mt-3">← к списку книг</a>
+{% endblock %}

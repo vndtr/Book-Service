@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Книги — Book Service{% endblock %}
+{% block content %}
+<h1>Книги</h1>
+
+<p>Всего книг: {{ books|length }}</p>
+
+{% for book in books %}
+    {% include "books/includes/book_card.html" %}
+{% empty %}
+    <p>Список книг пуст.</p>
+{% endfor %}
+
+{% endblock %}
