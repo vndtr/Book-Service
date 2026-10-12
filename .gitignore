@@ -40,3 +40,6 @@ desktop.ini
 
 # Логи
 *.log
+
+# Django
+db.sqlite3

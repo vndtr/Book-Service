@@ -1,7 +1,5 @@
 """Точка запуска программы."""
 
-import autopip
-
 from models import Book, BookList, User
 from models.status import ALL_STATUSES, get_status_display
 from storage import load_books, load_users, save_books, save_users
