@@ -3,6 +3,27 @@
 {% block content %}
 <h1>Книги</h1>
 
+<form method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <select name="status" class="form-select">
+            <option value="">Все статусы</option>
+            <option value="хочу прочитать" {% if status == 'хочу прочитать' %}selected{% endif %}>Хочу прочитать</option>
+            <option value="читаю" {% if status == 'читаю' %}selected{% endif %}>Читаю</option>
+            <option value="прочитано" {% if status == 'прочитано' %}selected{% endif %}>Прочитано</option>
+            <option value="отложено" {% if status == 'отложено' %}selected{% endif %}>Отложено</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <input type="number" name="year_from" value="{{ year_from }}" class="form-control" placeholder="Год от">
+    </div>
+    <div class="col-auto">
+        <input type="number" name="year_to" value="{{ year_to }}" class="form-control" placeholder="Год до">
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Применить</button>
+    </div>
+</form>
+
 <p>Всего книг: {{ books|length }}</p>
 
 {% for book in books %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Статистика — Book Service{% endblock %}
+{% block content %}
+<h1>Статистика книг</h1>
+<p>Всего книг: {{ total }}</p>
+
+<h2>По статусам</h2>
+{% for item in by_status %}
+    <p>{{ item.status }}: {{ item.count }}</p>
+{% empty %}
+    <p>Данные отсутствуют.</p>
+{% endfor %}
+
+<h2>Годы издания</h2>
+<p>
+    от {{ years.min_year }} до {{ years.max_year }},
+    средний: {{ years.avg_year|floatformat:0 }}
+</p>
+
+<h2>Книги по пользователям</h2>
+{% for item in by_user %}
+    <p>{{ item.user_name }}: {{ item.books_count }}</p>
+{% empty %}
+    <p>Данные отсутствуют.</p>
+{% endfor %}
+
+<h2>Три самые новые книги</h2>
+{% for b in newest %}
+    <p>{{ b.title }} ({{ b.year }})</p>
+{% empty %}
+    <p>Данные отсутствуют.</p>
+{% endfor %}
+
+<h2>Активные читатели (от 5 книг)</h2>
+{% for u in active_readers %}
+    <p>{{ u.user_name }}: {{ u.books_count }}</p>
+{% empty %}
+    <p>Пока таких нет.</p>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Поиск — Book Service{% endblock %}
+{% block content %}
+<h1>Поиск книг</h1>
+<form method="get">
+    <input type="text" name="q" value="{{ query }}" placeholder="Автор или название">
+    <button type="submit">Найти</button>
+</form>
+{% if query %}
+    {% for book in results %}
+        <p>{{ book.title }} — {{ book.author }} ({{ book.year }})</p>
+    {% empty %}
+        <p>Ничего не найдено.</p>
+    {% endfor %}
+{% endif %}
+{% endblock %}

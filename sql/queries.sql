@@ -34,3 +34,24 @@ FROM users
 JOIN books ON users.id = books.user_id
 GROUP BY users.id, users.name
 HAVING COUNT(books.id) >= 5;
+
+-- 11. LEFT JOIN: количество книг у каждого пользователя (в т.ч. без книг)
+SELECT users.name AS user_name, COUNT(books.id) AS books_count
+FROM users
+LEFT JOIN books ON users.id = books.user_id
+GROUP BY users.id, users.name
+ORDER BY books_count DESC;
+
+-- 12. Несколько условий (AND, IN, BETWEEN)
+SELECT title, year FROM books
+WHERE year BETWEEN 1800 AND 1999 AND status IN ('читаю', 'прочитано');
+
+-- 13. LIMIT + OFFSET (страница 2 по 2 книги)
+SELECT title, year FROM books ORDER BY year DESC LIMIT 2 OFFSET 2;
+
+-- 14. Пустые значения (IS NULL)
+SELECT title FROM books WHERE date_added IS NULL OR date_added = '';
+
+-- 15. Подзапрос: авторы, у которых нет прочитанных книг
+SELECT DISTINCT author FROM books
+WHERE author NOT IN (SELECT author FROM books WHERE status = 'прочитано');

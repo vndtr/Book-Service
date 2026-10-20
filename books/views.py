@@ -1,10 +1,7 @@
-import sqlite3
-from html import escape
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
-from models.status import get_status_display
-
-DB_PATH = "data/library.sqlite"
+from db.database import get_connection
+from models.status import get_status_display, is_valid_status
 
 STATUS_BADGES = {
     "прочитано": "bg-success",
@@ -14,24 +11,33 @@ STATUS_BADGES = {
 }
 
 
-def get_db_connection():
-    """Создание подключения к БД."""
-    conn = sqlite3.connect(DB_PATH)
-    # Позволяет обращаться к полям по именам: row['title']
-    conn.row_factory = sqlite3.Row
-    return conn
-
-
 def books(request):
-    """Страница /books/: список книг из базы данных."""
-    conn = get_db_connection()
-    books_data = conn.execute("""
-        SELECT books.id, books.title, books.author, books.year, 
+    """Страница /books/: список книг, фильтры по статусу и годам."""
+    status = request.GET.get("status", "").strip()
+    year_from = request.GET.get("year_from", "").strip()
+    year_to = request.GET.get("year_to", "").strip()
+
+    sql = """
+        SELECT books.id, books.title, books.author, books.year,
                books.status, users.name AS user_name
         FROM books
         JOIN users ON books.user_id = users.id
-        ORDER BY books.title;
-    """).fetchall()
+        WHERE 1 = 1
+    """
+    params = []
+    if status:
+        sql += " AND books.status = ?"
+        params.append(status)
+    if year_from.isdigit():
+        sql += " AND books.year >= ?"
+        params.append(int(year_from))
+    if year_to.isdigit():
+        sql += " AND books.year <= ?"
+        params.append(int(year_to))
+    sql += " ORDER BY books.title;"
+
+    conn = get_connection()
+    books_data = conn.execute(sql, params).fetchall()
     conn.close()
 
     books_list = []
@@ -47,13 +53,18 @@ def books(request):
             "status_display": get_status_display(b["status"]),
         })
 
-    context = {"books": books_list}
+    context = {
+    "books": books_list,
+    "status": status,
+    "year_from": year_from,
+    "year_to": year_to,
+    }
     return render(request, "books/book_list.html", context)
 
 
 def book_detail(request, book_id):
     """Страница /books/<id>/: информация об отдельной книге."""
-    conn = get_db_connection()
+    conn = get_connection()
     book = conn.execute("""
         SELECT books.*, users.name AS user_name
         FROM books
@@ -63,7 +74,12 @@ def book_detail(request, book_id):
     conn.close()
 
     if book is None:
-        return render(request, "books/book_detail.html", {"book": None}, status=404)
+        return render(
+            request,
+            "books/book_detail.html",
+            {"book": None},
+            status=404,
+        )
 
     context = {
         "book": book,
@@ -75,21 +91,48 @@ def book_detail(request, book_id):
 
 
 def stats(request):
-    """Страница /books/stats/: статистика (GROUP BY, COUNT)."""
-    conn = get_db_connection()
+    """Страница /books/stats/: статистика (GROUP BY, COUNT, AVG)."""
+    conn = get_connection()
     by_status = conn.execute("""
         SELECT status, COUNT(*) AS count
         FROM books
         GROUP BY status;
     """).fetchall()
     years = conn.execute("""
-        SELECT MIN(year) AS min_year, MAX(year) AS max_year FROM books;
+        SELECT MIN(year) AS min_year,
+               MAX(year) AS max_year,
+               AVG(year) AS avg_year
+        FROM books;
     """).fetchone()
+    by_user = conn.execute("""
+        SELECT users.name AS user_name, COUNT(books.id) AS books_count
+        FROM users
+        LEFT JOIN books ON users.id = books.user_id
+        GROUP BY users.id, users.name
+        ORDER BY books_count DESC;
+    """).fetchall()
+    total = conn.execute(
+        "SELECT COUNT(*) AS total FROM books;"
+    ).fetchone()
+    newest = conn.execute("""
+        SELECT title, year FROM books ORDER BY year DESC LIMIT 3;
+    """).fetchall()
+    active_readers = conn.execute("""
+        SELECT users.name AS user_name, COUNT(books.id) AS books_count
+        FROM users
+        JOIN books ON users.id = books.user_id
+        GROUP BY users.id, users.name
+        HAVING COUNT(books.id) >= 5;
+    """).fetchall()
     conn.close()
 
     context = {
         "by_status": by_status,
         "years": years,
+        "by_user": by_user,
+        "total": total["total"],
+        "newest": newest,
+        "active_readers": active_readers,
     }
     return render(request, "books/stats.html", context)
 
@@ -100,7 +143,7 @@ def search_books(request):
     results = []
 
     if query:
-        conn = get_db_connection()
+        conn = get_connection()
         results = conn.execute("""
             SELECT title, author, year
             FROM books
@@ -114,20 +157,19 @@ def search_books(request):
     }
     return render(request, "books/search.html", context)
 
+
 def change_status(request, book_id):
     """Изменение статуса книги (POST-запрос)."""
     if request.method == "POST":
         new_status = request.POST.get("status")
-        conn = get_db_connection()
-        # Запрос UPDATE для обновления данных в БД
-        conn.execute("""
-            UPDATE books 
-            SET status = ? 
-            WHERE id = ?
-        """, (new_status, book_id))
-        conn.commit()  # Сохраняем изменения
-        conn.close()
-        
-    # Перенаправляем обратно на страницу книги
-    from django.shortcuts import redirect
+        if is_valid_status(new_status):
+            conn = get_connection()
+            conn.execute("""
+                UPDATE books
+                SET status = ?
+                WHERE id = ?
+            """, (new_status, book_id))
+            conn.commit()
+            conn.close()
+
     return redirect("books:detail", book_id=book_id)

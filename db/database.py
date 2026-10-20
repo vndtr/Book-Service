@@ -2,10 +2,11 @@ import sqlite3
 
 DB_PATH = "data/library.sqlite"
 
+
 def get_connection():
     """Создать подключение к БД и включить проверку внешних ключей."""
     conn = sqlite3.connect(DB_PATH)
     conn.execute("PRAGMA foreign_keys = ON")
     # Позволяет обращаться к полям по именам (row['title'])
-    conn.row_factory = sqlite3.Row 
+    conn.row_factory = sqlite3.Row
     return conn
