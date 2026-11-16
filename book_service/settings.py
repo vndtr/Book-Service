@@ -10,7 +10,6 @@ SECRET_KEY = (
     "django-insecure-"
     "k7#bs2v@x9q!m4r%t1w&z8c^n5y(d3f)h6j+l0p_a-e=u"
 )
-
 # Режим отладки. Для проверки собственной страницы 404 временно
 # устанавливается False (см. раздел 5.4.7), после проверки возвращается True.
 DEBUG = True
@@ -24,11 +23,14 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+     "debug_toolbar",
     "homepage",
     "books",
+    "users",
 ]
 
 MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -105,3 +107,5 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+INTERNAL_IPS = ["127.0.0.1", "localhost"]
