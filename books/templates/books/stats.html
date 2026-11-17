@@ -1,12 +1,20 @@
 {% extends "base.html" %}
-{% block title %}Статистика — Book Service{% endblock %}
+{% block title %}Статистика — {{ site_name }}{% endblock %}
 {% block content %}
 <h1>Статистика книг</h1>
-<p>Всего книг: {{ total }}</p>
+<p>Всего книг: {{ counts.total }}</p>
 
 <h2>По статусам</h2>
+<ul>
+    <li>Хочу прочитать: {{ counts.want_to_read }}</li>
+    <li>Читаю: {{ counts.reading }}</li>
+    <li>Прочитано: {{ counts.read }}</li>
+    <li>Отложено: {{ counts.on_hold }}</li>
+</ul>
+
+<h2>Группировка по статусам</h2>
 {% for item in by_status %}
-    <p>{{ item.status }}: {{ item.count }}</p>
+    <p>{{ item.label }}: {{ item.count }}</p>
 {% empty %}
     <p>Данные отсутствуют.</p>
 {% endfor %}
@@ -19,21 +27,21 @@
 
 <h2>Книги по пользователям</h2>
 {% for item in by_user %}
-    <p>{{ item.user_name }}: {{ item.books_count }}</p>
+    <p>{{ item.name }}: {{ item.books_count }}</p>
 {% empty %}
     <p>Данные отсутствуют.</p>
 {% endfor %}
 
 <h2>Три самые новые книги</h2>
 {% for b in newest %}
-    <p>{{ b.title }} ({{ b.year }})</p>
+    <p><a href="{{ b.get_absolute_url }}">{{ b.title }}</a> ({{ b.year }})</p>
 {% empty %}
     <p>Данные отсутствуют.</p>
 {% endfor %}
 
 <h2>Активные читатели (от 5 книг)</h2>
 {% for u in active_readers %}
-    <p>{{ u.user_name }}: {{ u.books_count }}</p>
+    <p>{{ u.name }}: {{ u.books_count }}</p>
 {% empty %}
     <p>Пока таких нет.</p>
 {% endfor %}

@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = (
     "django-insecure-"
     "k7#bs2v@x9q!m4r%t1w&z8c^n5y(d3f)h6j+l0p_a-e=u"
-)  # noqa: E131
+)
 # Режим отладки. Для проверки собственной страницы 404 временно
 # устанавливается False (см. раздел 5.4.7), после проверки возвращается True.
 DEBUG = True
@@ -23,10 +23,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-     "debug_toolbar",
     "homepage",
     "books",
     "users",
+    # Инструмент анализа запросов и отладки.
+    "debug_toolbar",
 ]
 
 MIDDLEWARE = [
@@ -53,6 +54,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                # Общие данные Book Service для всех шаблонов.
                 "books.context_processors.book_context",
             ],
         },
@@ -61,8 +63,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "book_service.wsgi.application"
 
-# База данных Django используется только для служебных таблиц.
-# Данные Book Service по-прежнему хранятся в JSON-файлах (каталог data/).
+# Целевая база Django (db.sqlite3): модели User и Book работают через ORM.
+# Исходная база ПР7 (data/library.sqlite) нужна только для переноса данных.
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -110,3 +112,7 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 INTERNAL_IPS = ["127.0.0.1", "localhost"]
+
+# Загруженные пользователями файлы (обложки книг).
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"

@@ -14,3 +14,35 @@ body {
     border: 1px solid #ddd;
     border-radius: 8px;
 }
+
+/* Форма фильтрации списка книг */
+.book-filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding: 16px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+}
+
+.filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 180px;
+}
+
+/* Сообщения об ошибках полей формы */
+.form-error {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 4px;
+}
+
+/* Обложка книги на странице книги */
+.book-cover {
+    max-height: 320px;
+}

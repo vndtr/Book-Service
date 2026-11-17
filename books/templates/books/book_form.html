@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}{% if book %}Редактирование книги{% else %}Новая книга{% endif %} — {{ site_name }}{% endblock %}
+{% block content %}
+<h1>{% if book %}Редактирование книги{% else %}Добавление книги{% endif %}</h1>
+
+<!-- enctype нужен для передачи файла обложки -->
+<form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+
+    {# Ошибки, не связанные с конкретным полем #}
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% for field in form %}
+        <div class="mb-3">
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.help_text %}
+                <div class="form-text">{{ field.help_text }}</div>
+            {% endif %}
+            {% for error in field.errors %}
+                <div class="form-error">{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a href="{% url 'books:list' %}" class="btn btn-outline-secondary">Отмена</a>
+</form>
+{% endblock %}

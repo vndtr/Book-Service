@@ -15,6 +15,11 @@ django.setup()
 from users.models import User  # noqa: E402
 from books.models import Book  # noqa: E402
 
+# Русские названия статусов исходной базы -> коды Book.Status.
+STATUS_BY_LABEL = {
+    label.lower(): value for value, label in Book.Status.choices
+}
+
 SOURCE_DB = BASE_DIR / "data" / "library.sqlite"
 USERS_FILE = BASE_DIR / "data" / "users.json"
 
@@ -66,7 +71,10 @@ def main():
                             "title": row["title"],
                             "author": row["author"],
                             "year": row["year"],
-                            "status": row["status"],
+                            "status": STATUS_BY_LABEL.get(
+                                str(row["status"]).lower(),
+                                Book.Status.WANT_TO_READ,
+                            ),
                             "date_added": get_row_value(
                                 row, "date_added", ""
                             ),

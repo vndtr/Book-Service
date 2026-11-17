@@ -1,14 +1,17 @@
 {% extends "base.html" %}
-{% block title %}Поиск — Book Service{% endblock %}
+{% block title %}Поиск — {{ site_name }}{% endblock %}
 {% block content %}
 <h1>Поиск книг</h1>
-<form method="get">
-    <input type="text" name="q" value="{{ query }}" placeholder="Автор или название">
+<form method="get" class="mb-3">
+    <input type="text" name="q" value="{{ query }}" placeholder="Название, автор или пользователь">
     <button type="submit">Найти</button>
 </form>
 {% if query %}
     {% for book in results %}
-        <p>{{ book.title }} — {{ book.author }} ({{ book.year }})</p>
+        <p>
+            <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
+            — {{ book.author }} ({{ book.year }}), добавил: {{ book.user.name }}
+        </p>
     {% empty %}
         <p>Ничего не найдено.</p>
     {% endfor %}

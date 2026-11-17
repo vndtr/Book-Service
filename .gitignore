@@ -43,3 +43,6 @@ desktop.ini
 
 # Django
 db.sqlite3
+
+# Загруженные пользователями файлы
+media/

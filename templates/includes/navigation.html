@@ -1,6 +1,7 @@
 <nav class="nav">
     <a class="nav-link" href="{% url 'homepage:index' %}">Главная</a>
-    <a class="nav-link" href="{% url 'books:list' %}">Книги</a>
+    <a class="nav-link" href="{% url 'books:list' %}">Книги ({{ books_count }})</a>
+    <a class="nav-link" href="{% url 'books:create' %}">Добавить книгу</a>
     <a class="nav-link" href="{% url 'books:search' %}">Поиск</a>
     <a class="nav-link" href="{% url 'books:stats' %}">Статистика</a>
 </nav>

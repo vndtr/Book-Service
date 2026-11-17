@@ -1,13 +1,26 @@
 <article class="card book-card mb-3">
     <div class="card-body">
-        <h2 class="card-title">
+        <h2 class="card-title h4">
             {{ book.title|default:"Без названия" }}
         </h2>
         <p class="card-text">
             Автор: {{ book.author }}<br>
             Год: {{ book.year }}<br>
-            Статус: <span class="badge bg-secondary">{{ book.get_status_display|default:book.status }}</span>
+            Пользователь: {{ book.user_name }}<br>
+            Статус: <span class="badge {{ book.badge_class|default:'bg-secondary' }}">{{ book.status_display|default:book.status }}</span>
         </p>
-        <a href="{% url 'books:detail' book.slug %}" class="btn btn-primary">Подробнее</a>
+        <a href="{% url 'books:detail' book.slug %}"
+           class="btn btn-primary">Подробнее</a>
+        {% if book.can_edit %}
+            <a href="{% url 'books:update' book.id %}"
+               class="btn btn-outline-primary">Редактировать</a>
+            <!-- Отложить книгу можно только POST-запросом -->
+            <form method="post"
+                  action="{% url 'books:hold' book.id %}"
+                  class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger">Отложить</button>
+            </form>
+        {% endif %}
     </div>
 </article>
