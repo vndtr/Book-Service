@@ -6,9 +6,8 @@
         <p class="card-text">
             Автор: {{ book.author }}<br>
             Год: {{ book.year }}<br>
-            Статус: <span class="badge {{ book.badge_class|default:'bg-secondary' }}">{{ book.status_display|default:book.status }}</span>
+            Статус: <span class="badge bg-secondary">{{ book.get_status_display|default:book.status }}</span>
         </p>
-        <a href="{% url 'books:detail' book.id %}"
-           class="btn btn-primary">Подробнее</a>
+        <a href="{% url 'books:detail' book.slug %}" class="btn btn-primary">Подробнее</a>
     </div>
 </article>

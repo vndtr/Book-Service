@@ -13,7 +13,7 @@
             <p class="card-text"><strong>Автор:</strong> {{ book.author }}</p>
             <p class="card-text"><strong>Год:</strong> {{ book.year }}</p>
             <p class="card-text"><strong>Дата добавления:</strong> {{ book.date_added }}</p>
-            <p class="card-text"><strong>Добавил:</strong> {{ book.user_name }}</p>
+            <p class="card-text"><strong>Добавил:</strong> {{ book.user.name }}</p>
             
             <!-- Блок со статусом и бейджем -->
             <p class="card-text">
@@ -25,16 +25,15 @@
                 {% if is_read %}да{% else %}нет{% endif %}
             </p>
 
-            <!-- Форма изменения статуса -->
+                        <!-- Форма изменения статуса -->
             <form method="post" action="{% url 'books:change_status' book.id %}" class="mt-3 border-top pt-3">
                 {% csrf_token %}
                 <label for="status" class="form-label"><strong>Изменить статус:</strong></label>
                 <div class="input-group">
                     <select name="status" id="status" class="form-select">
-                        <option value="хочу прочитать" {% if book.status == 'хочу прочитать' %}selected{% endif %}>Хочу прочитать</option>
-                        <option value="читаю" {% if book.status == 'читаю' %}selected{% endif %}>Читаю</option>
-                        <option value="прочитано" {% if book.status == 'прочитано' %}selected{% endif %}>Прочитано</option>
-                        <option value="отложено" {% if book.status == 'отложено' %}selected{% endif %}>Отложено</option>
+                        {% for value, label in statuses %}
+                            <option value="{{ value }}" {% if book.status == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
                     </select>
                     <button type="submit" class="btn btn-success">Сохранить</button>
                 </div>

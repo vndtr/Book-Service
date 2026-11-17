@@ -4,27 +4,38 @@
 <h1>Книги</h1>
 
 <form method="get" class="row g-2 mb-3">
+    <!-- Фильтр по статусу (с новыми кодами) -->
     <div class="col-auto">
         <select name="status" class="form-select">
             <option value="">Все статусы</option>
-            <option value="хочу прочитать" {% if status == 'хочу прочитать' %}selected{% endif %}>Хочу прочитать</option>
-            <option value="читаю" {% if status == 'читаю' %}selected{% endif %}>Читаю</option>
-            <option value="прочитано" {% if status == 'прочитано' %}selected{% endif %}>Прочитано</option>
-            <option value="отложено" {% if status == 'отложено' %}selected{% endif %}>Отложено</option>
+            {% for value, label in statuses %}
+                <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
         </select>
     </div>
+    <!-- Фильтр по годам -->
     <div class="col-auto">
         <input type="number" name="year_from" value="{{ year_from }}" class="form-control" placeholder="Год от">
     </div>
     <div class="col-auto">
         <input type="number" name="year_to" value="{{ year_to }}" class="form-control" placeholder="Год до">
     </div>
+    <!-- Сортировка -->
+    <div class="col-auto">
+        <select name="sort" class="form-select">
+            <option value="title" {% if sort == 'title' %}selected{% endif %}>По названию</option>
+            <option value="year" {% if sort == 'year' %}selected{% endif %}>По году (сначала старые)</option>
+            <option value="year_desc" {% if sort == 'year_desc' %}selected{% endif %}>По году (сначала новые)</option>
+            <option value="author" {% if sort == 'author' %}selected{% endif %}>По автору</option>
+        </select>
+    </div>
     <div class="col-auto">
         <button type="submit" class="btn btn-primary">Применить</button>
+        <a href="{% url 'books:list' %}" class="btn btn-outline-secondary">Сбросить</a>
     </div>
 </form>
 
-<p>Всего книг: {{ books|length }}</p>
+<p>Всего книг: {{ total }}</p>
 
 {% for book in books %}
     {% include "books/includes/book_card.html" %}
@@ -32,15 +43,13 @@
     <p>Список книг пуст.</p>
 {% endfor %}
 
-{% endblock %}
-
-<!-- Блок пагинации -->
+<!-- Блок пагинации (ВНУТРИ block content) -->
 {% if page_obj.paginator.num_pages > 1 %}
 <nav aria-label="Навигация по страницам" class="mt-4">
     <ul class="pagination justify-content-center">
         {% if page_obj.has_previous %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if status %}&status={{ status }}{% endif %}{% if year_from %}&year_from={{ year_from }}{% endif %}{% if year_to %}&year_to={{ year_to }}{% endif %}">Назад</a>
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if status %}&status={{ status }}{% endif %}{% if year_from %}&year_from={{ year_from }}{% endif %}{% if year_to %}&year_to={{ year_to }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">Назад</a>
             </li>
         {% else %}
             <li class="page-item disabled"><span class="page-link">Назад</span></li>
@@ -53,14 +62,14 @@
                 </li>
             {% else %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_number }}{% if status %}&status={{ status }}{% endif %}{% if year_from %}&year_from={{ year_from }}{% endif %}{% if year_to %}&year_to={{ year_to }}{% endif %}">{{ page_number }}</a>
+                    <a class="page-link" href="?page={{ page_number }}{% if status %}&status={{ status }}{% endif %}{% if year_from %}&year_from={{ year_from }}{% endif %}{% if year_to %}&year_to={{ year_to }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">{{ page_number }}</a>
                 </li>
             {% endif %}
         {% endfor %}
 
         {% if page_obj.has_next %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if status %}&status={{ status }}{% endif %}{% if year_from %}&year_from={{ year_from }}{% endif %}{% if year_to %}&year_to={{ year_to }}{% endif %}">Далее</a>
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if status %}&status={{ status }}{% endif %}{% if year_from %}&year_from={{ year_from }}{% endif %}{% if year_to %}&year_to={{ year_to }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">Далее</a>
             </li>
         {% else %}
             <li class="page-item disabled"><span class="page-link">Далее</span></li>
@@ -68,3 +77,5 @@
     </ul>
 </nav>
 {% endif %}
+
+{% endblock %}

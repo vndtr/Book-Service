@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = (
     "django-insecure-"
     "k7#bs2v@x9q!m4r%t1w&z8c^n5y(d3f)h6j+l0p_a-e=u"
-)
+)  # noqa: E131
 # Режим отладки. Для проверки собственной страницы 404 временно
 # устанавливается False (см. раздел 5.4.7), после проверки возвращается True.
 DEBUG = True
@@ -53,6 +53,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "books.context_processors.book_context",
             ],
         },
     },
